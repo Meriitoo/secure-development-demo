@@ -45,3 +45,14 @@ def test_customer_note_is_escaped_for_html_text():
 
 def test_plain_note_remains_readable():
     assert render_invoice_note('Invoice paid') == 'Invoice paid'
+
+
+def test_string_identifier_still_requires_the_correct_owner(service):
+    assert service.read_invoice(1, '101')['owner_id'] == 1
+    assert service.read_invoice(2, '101') is None
+
+
+def test_image_markup_is_escaped_as_customer_text():
+    rendered = render_invoice_note('<img src=x onerror="alert(1)">')
+    assert '<img' not in rendered
+    assert '&lt;img' in rendered
