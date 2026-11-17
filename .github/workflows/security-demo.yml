@@ -1,0 +1,34 @@
+name: Security demo checks
+on:
+  pull_request:
+    branches:
+      - main
+      - demo/actions-workflow
+    types:
+      - opened
+      - synchronize
+      - reopened
+permissions:
+  contents: read
+jobs:
+  baseline-check:
+    name: Passing baseline check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify the demo workflow ran
+        run: |
+          echo "Baseline check passed."
+          test "$GITHUB_EVENT_NAME" = "pull_request"
+  security-demo:
+    name: Intentional pass/fail security check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pass except on the designated demo branch
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if [ "$HEAD_REF" = "demo/failing-check" ]; then
+            echo "::error::Intentional failure for the GitHub Security Integration demo."
+            exit 1
+          fi
+          echo "PASS: security demo check completed."
