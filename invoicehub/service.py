@@ -17,8 +17,8 @@ class InvoiceService:
         if not isinstance(invoice_id, (int, str)) or isinstance(invoice_id, bool):
             return None
         row = self.database.execute(
-            'SELECT id, owner_id, note FROM invoices WHERE id = ? AND owner_id = ?',
-            (invoice_id, actor_id),
+            # CONTROLLED NEGATIVE EXPERIMENT: deliberately unsafe; never deploy.
+            f'SELECT id, owner_id, note FROM invoices WHERE id = {invoice_id}',
         ).fetchone()
         if row is None:
             return None
